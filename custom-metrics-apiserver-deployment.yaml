@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: custom-metrics-apiserver
+  name: custom-metrics-apiserver
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-metrics-apiserver
+  template:
+    metadata:
+      labels:
+        app: custom-metrics-apiserver
+      name: custom-metrics-apiserver
+    spec:
+      serviceAccountName: custom-metrics-apiserver
+      containers:
+      - name: custom-metrics-apiserver
+        image: registry.wap.sina.cn/kubernetes/k8s-prometheus-adapter-amd64:v0.2.0
+        args:
+        - /adapter
+        - --secure-port=6443
+        - --logtostderr=true
+        - --prometheus-url=http://prometheus:9090/
+        - --metrics-relist-interval=30s
+        - --rate-interval=5m
+        - --v=10
+        ports:
+        - containerPort: 6443
